@@ -1,0 +1,70 @@
+# 发票整理工具 - Windows 打包配置
+# 使用 GitHub Actions 自动构建
+
+name: Build Windows Executable
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install PyMuPDF pdf2image pytesseract Pillow
+        
+    - name: Install Tesseract
+      run: |
+        choco install tesseract
+        choco install poppler
+      continue-on-error: true
+    
+    - name: Build executable
+      run: |
+        pyinstaller --onefile --windowed --name "发票整理工具" --clean --noconfirm invoice_organizer.py
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows-Executable
+        path: dist/*.exe
+    
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        files: dist/*.exe
+        body: |
+          ## 发票整理工具 v${{ github.run_number }}
+          
+          ### 更新内容
+          - Windows 免安装版
+          
+          ### 使用方法
+          1. 下载 `发票整理工具.exe`
+          2. 双击运行
+          3. 无需安装 Python 或任何依赖
+          
+          ### 系统要求
+          - Windows 10/11
+          - 无需安装其他软件
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
