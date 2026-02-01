@@ -246,18 +246,18 @@ class InvoiceProcessor:
             match = re.search(pattern, text)
             if match:
                 date_str = match.group(1)
-                # 统一格式为 YYYY-MM-DD
-                date_str = re.sub(r'[年月/]', '-', date_str)
-                date_str = date_str.replace('日', '').replace('-', '')
+                # 统一格式为 YYYYMMDD（无横线）
+                date_str = re.sub(r'[年月/\-]', '', date_str)
+                date_str = date_str.replace('日', '')
                 if len(date_str) == 8:
-                    info['date'] = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}"
+                    info['date'] = date_str
                 else:
-                    info['date'] = date_str[:10]
+                    info['date'] = date_str[:8]
                 break
         
         # 如果没有找到日期，使用文件日期
         if not info['date']:
-            info['date'] = datetime.now().strftime("%Y-%m-%d")
+            info['date'] = datetime.now().strftime("%Y%m%d")
         
         # 提取开票方/销售方名称
         seller_patterns = [
