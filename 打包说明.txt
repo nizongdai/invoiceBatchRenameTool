@@ -1,0 +1,53 @@
+# 如何在 Windows 上将程序打包为 EXE
+
+由于开发环境是 macOS，无法直接生成 Windows 的 .exe 文件。请在您的 Windows 电脑上按照以下步骤操作，即可生成独立的 .exe 程序。
+
+## 1. 准备工作
+确保您的 Windows 电脑上已安装 Python。
+如果没有安装，请访问 https://www.python.org/downloads/ 下载并安装。
+**重要提示**：安装时请务必勾选 **"Add Python to PATH"** 选项。如果已经安装但忘记勾选，可以使用下面的“稳健命令”。
+
+## 2. 安装依赖库
+打开命令提示符（CMD）或 PowerShell，进入本程序所在的文件夹。
+
+**遇到 "无法识别 pip" 错误时的解决方法：**
+这是因为 Python 的工具没有添加到系统的环境变量中。请使用 `python -m pip` 来代替 `pip`。
+
+运行以下命令安装必要的库：
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+*如果上面的命令也提示找不到 `python`，请尝试使用 `py` 命令：*
+```bash
+py -m pip install -r requirements.txt
+```
+
+然后安装打包工具 `pyinstaller`：
+
+```bash
+python -m pip install pyinstaller
+```
+*(或者 `py -m pip install pyinstaller`)*
+
+## 3. 执行打包命令
+在当前文件夹下，运行以下命令开始打包（同样建议加 `python -m` 前缀）：
+
+```bash
+python -m PyInstaller --onefile --windowed --name="发票自动重命名工具" invoice_renamer_ui.py
+```
+*(或者 `py -m PyInstaller ...`)*
+
+**参数说明：**
+- `--onefile`：将所有内容打包成一个单独的 .exe 文件。
+- `--windowed`：程序运行时不显示黑色的命令行窗口（适合 GUI 程序）。
+- `--name="..."`：指定生成的文件名。
+
+## 4. 获取 EXE 文件
+打包完成后，您会在当前目录下的 `dist` 文件夹中找到 `发票自动重命名工具.exe`。
+您可以将这个文件复制到任何 Windows 电脑上运行，无需再安装 Python 或其他软件。
+
+## 注意事项
+- 本程序使用的图形界面库 `tkinter` 是 Python 内置的标准库，不需要安装 .NET Framework。
+- 打包过程可能需要几分钟，请耐心等待。
